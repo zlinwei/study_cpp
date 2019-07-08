@@ -32,6 +32,9 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 find_package(OpenCL REQUIRED)
 
 
+# glog
+find_package(glog CONFIG REQUIRED)
+
 add_subdirectory(study_boost_asio)
 add_subdirectory(study_boost_compute)
 

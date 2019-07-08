@@ -3,19 +3,24 @@
 //
 
 #include <iostream>
-
 #include <boost/compute/core.hpp>
+
+#include <glog/logging.h>
 
 namespace compute = boost::compute;
 
-int main()
-{
+int main() {
+    // get the device count
+    LOG(INFO) << "Dev Count: " << compute::system::device_count();
+    for (auto &dev : compute::system::devices()) {
+        LOG(INFO) << dev.name() << "(platform: " << dev.platform().name() << ")" << " Dev ID: " << dev.id();
+    }
+
     // get the default device
     compute::device device = compute::system::default_device();
 
     // print the device's name and platform
-    std::cout << "hello from " << device.name();
-    std::cout << " (platform: " << device.platform().name() << ")" << std::endl;
-
+    LOG(INFO) << "Default: " << device.name();
+    LOG(INFO) << "Default Device ID: " << device.id();
     return 0;
 }
