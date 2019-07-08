@@ -3,7 +3,7 @@ project(study_cpp)
 
 set(CMAKE_CXX_STANDARD 14)
 
-#BOOST
+# BOOST
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -28,8 +28,11 @@ message(status "** Boost Libraries: ${Boost_LIBRARIES}")
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
+# OpenCL
+find_package(OpenCL REQUIRED)
 
 
 add_subdirectory(study_boost_asio)
+add_subdirectory(study_boost_compute)
 
 add_executable(study_cpp main.cpp)
