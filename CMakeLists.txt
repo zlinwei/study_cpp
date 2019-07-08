@@ -30,6 +30,6 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 
 
-add_subdirectory(study_boost)
+add_subdirectory(study_boost_asio)
 
 add_executable(study_cpp main.cpp)
