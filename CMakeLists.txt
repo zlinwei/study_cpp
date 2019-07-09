@@ -28,14 +28,11 @@ message(status "** Boost Libraries: ${Boost_LIBRARIES}")
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
-# OpenCL
-find_package(OpenCL REQUIRED)
-
-
 # glog
 find_package(glog CONFIG REQUIRED)
 
 add_subdirectory(study_boost_asio)
 add_subdirectory(study_boost_compute)
+add_subdirectory(study_opencv)
 
 add_executable(study_cpp main.cpp)
