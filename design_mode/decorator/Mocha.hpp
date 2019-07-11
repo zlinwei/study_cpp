@@ -15,12 +15,32 @@ public:
 
     }
 
+    void setSize(CAPACITY size) override {
+        _beverage->setSize(size);
+    }
+
+    CAPACITY getSize() override {
+        return _beverage->getSize();
+    }
+
     std::string getDescription() override {
         return _beverage->getDescription() + " ,Mocha";
     }
 
     double cost() override {
-        return .20 + _beverage->cost();
+        double cost = _beverage->cost();
+        switch (_beverage->getSize()) {
+            case TALL:
+                cost += 0.10;
+                break;
+            case GRANDE:
+                cost += 0.15;
+                break;
+            case VENTI:
+                cost += 0.20;
+                break;
+        }
+        return cost;
     }
 
 private:

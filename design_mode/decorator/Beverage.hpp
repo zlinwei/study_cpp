@@ -12,6 +12,12 @@ class Beverage {
 public:
     typedef std::unique_ptr<Beverage> uptr;
 
+    enum CAPACITY {
+        TALL,
+        GRANDE,
+        VENTI
+    };
+
     virtual std::string getDescription() {
         return _description;
     }
@@ -20,8 +26,21 @@ public:
 
     virtual ~Beverage() = default;
 
+    virtual CAPACITY getSize() const {
+        return _size;
+    }
+
+    virtual void setSize(CAPACITY size) {
+        _size = size;
+    }
+
 protected:
     std::string _description = "unknown beverage";
+
+
+private:
+    CAPACITY _size = TALL;
+
 };
 
 

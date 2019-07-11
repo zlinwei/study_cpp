@@ -13,6 +13,14 @@ public:
 
     }
 
+    void setSize(CAPACITY size) override {
+        _beverage->setSize(size);
+    }
+
+    CAPACITY getSize() override {
+        return _beverage->getSize();
+    }
+
     std::string getDescription() override {
         return _beverage->getDescription() + " ,Whip";
     }

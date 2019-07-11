@@ -9,7 +9,9 @@
 
 class CondimentDecorator : public Beverage {
 public:
+    void setSize(CAPACITY size) override = 0;
 
+    virtual CAPACITY getSize() = 0;
 };
 
 

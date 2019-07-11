@@ -13,13 +13,17 @@
 
 int main(int, char *[]) {
     Beverage::uptr beverage = Beverage::uptr(new Espresso());
-    LOG(INFO) << beverage->getDescription() << " $" << beverage->cost();
 
+    LOG(INFO) << beverage->getDescription() << " $" << beverage->cost();
 
     Beverage::uptr mocha = Beverage::uptr(new Mocha(std::move(beverage)));
     LOG(INFO) << mocha->getDescription() << " $" << mocha->cost();
 
     Beverage::uptr whip = Beverage::uptr(new Whip(std::move(mocha)));
+
+    whip->setSize(Beverage::VENTI);
     LOG(INFO) << whip->getDescription() << " $" << whip->cost();
+
+
     return 0;
 }
