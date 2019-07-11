@@ -15,6 +15,7 @@ SET(BOOST_REQUIRED_COMPONENTS
         regex
         system
         thread
+        python3.7
         )
 set(BOOST_MIN_VERSION "1.58")
 set(Boost_ADDITIONAL_VERSIONS
@@ -22,17 +23,18 @@ set(Boost_ADDITIONAL_VERSIONS
         "1.64" "1.65" "1.66" "1.67" "1.68" "1.69" "1.70"
         )
 find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${BOOST_REQUIRED_COMPONENTS})
-message(status "** Boost Include: ${Boost_INCLUDE_DIR}")
-message(status "** Boost Libraries: ${Boost_LIBRARY_DIRS}")
-message(status "** Boost Libraries: ${Boost_LIBRARIES}")
+message(STATUS "** Boost Include: ${Boost_INCLUDE_DIR}")
+message(STATUS "** Boost Libraries: ${Boost_LIBRARY_DIRS}")
+message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR}/python3.7)
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-
 # glog
 find_package(glog CONFIG REQUIRED)
 
 add_subdirectory(study_boost_asio)
 add_subdirectory(study_boost_compute)
 add_subdirectory(study_opencv)
+add_subdirectory(study_boost_python)
 
 add_executable(study_cpp main.cpp)
