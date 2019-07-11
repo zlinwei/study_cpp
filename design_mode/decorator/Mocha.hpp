@@ -15,8 +15,8 @@ public:
 
     }
 
-    std::string getDestription() override {
-        return _beverage->getDestription() + " ,Mocha";
+    std::string getDescription() override {
+        return _beverage->getDescription() + " ,Mocha";
     }
 
     double cost() override {

@@ -12,7 +12,7 @@ class Beverage {
 public:
     typedef std::unique_ptr<Beverage> uptr;
 
-    virtual std::string getDestription() {
+    virtual std::string getDescription() {
         return _description;
     }
 

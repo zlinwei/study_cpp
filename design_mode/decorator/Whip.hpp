@@ -13,8 +13,8 @@ public:
 
     }
 
-    std::string getDestription() override {
-        return _beverage->getDestription() + " ,Whip";
+    std::string getDescription() override {
+        return _beverage->getDescription() + " ,Whip";
     }
 
     double cost() override {
