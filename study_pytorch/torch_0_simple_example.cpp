@@ -4,7 +4,6 @@
 
 #include <torch/torch.h>
 #include <iostream>
-#include <torch/torch.h>
 
 /*
  * In Python, it would look like this:
@@ -35,7 +34,7 @@ struct Net : torch::nn::Module {
 int main() {
     torch::Tensor tensor = torch::eye(3);
     std::cout << tensor << std::endl;
-
+	
     return 0;
 }
 
