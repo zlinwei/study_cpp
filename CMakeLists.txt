@@ -36,6 +36,7 @@ add_subdirectory(study_boost_asio)
 add_subdirectory(study_boost_compute)
 add_subdirectory(study_opencv)
 add_subdirectory(study_boost_python)
+add_subdirectory(study_pytorch)
 add_subdirectory(design_mode)
 
 add_executable(study_cpp main.cpp)
