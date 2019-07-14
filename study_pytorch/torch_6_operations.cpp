@@ -18,5 +18,19 @@ int main(int, char *[]) {
     torch::Tensor y = torch::from_blob(yv.data(), {2, 3}, at::kFloat);
     LOG(INFO) << y;
 
+    x = torch::ones({2, 2}, torch::requires_grad());
+    LOG(INFO) << x;
+    auto y1 = x + 2;
+    auto z = y1 * y1 * 3;
+    auto out = z.mean();
+
+    out.backward();
+
+    LOG(INFO) << z;
+    LOG(INFO) << out;
+    LOG(INFO) << x.grad();
+    LOG(INFO) << y1.grad();
+    LOG(INFO) << z.grad();
+    LOG(INFO) << out.grad();
     return 0;
 }
