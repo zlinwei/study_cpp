@@ -85,10 +85,25 @@ int main(int, char *[]) {
     torch::optim::Adam discriminator_optimizer(
             discriminator->parameters(), torch::optim::AdamOptions(5e-4).beta1(0.5));
 
+    try {
+        torch::load(generator, "generator-checkpoint.pt");
+        torch::load(generator_optimizer, "generator-optimizer-checkpoint.pt");
+        torch::load(discriminator, "discriminator-checkpoint.pt");
+        torch::load(discriminator_optimizer, "discriminator-optimizer-checkpoint.pt");
+    } catch (std::exception &e) {
+        LOG(INFO) << e.what();
+    } catch (...) {
+        LOG(INFO) << "Uncaught error";
+    }
+
 
     const int64_t kNumberOfEpochs = 10;
 
     int64_t batches_per_epoch = 0;
+
+    int64_t kCheckpointEvery = 20;
+
+    int64_t checkpoint_counter = 0;
 
     for (int64_t epoch = 1; epoch <= kNumberOfEpochs; ++epoch) {
         int64_t batch_index = 0;
@@ -130,6 +145,19 @@ int main(int, char *[]) {
                     g_loss.item<float>());
 
             batches_per_epoch = batches_per_epoch < batch_index ? batch_index : batches_per_epoch;
+
+            //save to file
+            if (batch_index % kCheckpointEvery == 0) {
+                // Checkpoint the model and optimizer state.
+                torch::save(generator, "generator-checkpoint.pt");
+                torch::save(generator_optimizer, "generator-optimizer-checkpoint.pt");
+                torch::save(discriminator, "discriminator-checkpoint.pt");
+                torch::save(discriminator_optimizer, "discriminator-optimizer-checkpoint.pt");
+                // Sample the generator and save the images.
+                torch::Tensor samples = generator->forward(torch::randn({8, kNoiseSize, 1, 1}, torch::requires_grad()));
+                torch::save((samples + 1.0) / 2.0, torch::str("dcgan-sample-", checkpoint_counter, ".pt"));
+                std::cout << "\n-> checkpoint " << ++checkpoint_counter << '\n';
+            }
         }
     }
 
