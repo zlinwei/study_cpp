@@ -32,5 +32,9 @@ int main(int, char *[]) {
     LOG(INFO) << y1.grad();
     LOG(INFO) << z.grad();
     LOG(INFO) << out.grad();
+
+
+    torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
+
     return 0;
 }
