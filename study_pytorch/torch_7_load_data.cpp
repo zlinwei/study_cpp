@@ -15,6 +15,8 @@ public:
 
     torch::data::Example<> get(size_t index) override;
 
+    c10::optional<size_t> size() const override;
+
 private:
     void read_data(const std::string &loc) {
         //TODO read data into states and labels
@@ -29,6 +31,10 @@ private:
 
 torch::data::Example<> HumanProteinAtlasDataset::get(size_t index) {
     return {_states.at(index), _labels.at(index)};
+}
+
+c10::optional<size_t> HumanProteinAtlasDataset::size() const {
+    return std::min<size_t>(_states.size(), _labels.size());
 }
 
 int main(int, char *[]) {
