@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <torch/torch.h>
+#include <glog/logging.h>
 
 class HumanProteinAtlasDataset :
         public torch::data::Dataset<HumanProteinAtlasDataset> {
@@ -17,19 +18,25 @@ public:
 private:
     void read_data(const std::string &loc) {
         //TODO read data into states and labels
+
     }
 
 
 private:
-    torch::Tensor _states;
-    torch::Tensor _labels;
+    std::vector<torch::Tensor> _states;
+    std::vector<torch::Tensor> _labels;
 };
 
 torch::data::Example<> HumanProteinAtlasDataset::get(size_t index) {
-    return {_states[index], _labels[index]};
+    return {_states.at(index), _labels.at(index)};
 }
 
 int main(int, char *[]) {
+//    torch::Tensor tensor = torch::ones({2, 3, 3, 3});
+//    LOG(INFO) << tensor[0];
+//    LOG(INFO) << tensor[1];
+//    LOG(INFO) << tensor[2];
+//    tensor[3] = torch::ones({3, 3, 3}); // will throw an exception of out of range
 
 
     return 0;
