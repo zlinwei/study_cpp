@@ -73,21 +73,28 @@ private:
 
         CSVRow row;
         while (ifile >> row) {
-            std::string target = row[1];
             std::string filename = loc + "train/" + row[0] + "_green.png";
+            //read image
             auto img_ = cv::imread(filename, cv::IMREAD_GRAYSCALE);
             if (img_.empty())continue;
             cv::Mat img(512, 512, CV_8UC1);
             cv::resize(img_, img, img.size(), 0, 0, cv::INTER_AREA);
-            LOG(INFO) << "rows: " << img.rows << " cols: " << img.cols;
             auto image = torch::tensor(torch::ArrayRef < uint8_t > (img.data, img.rows * img.cols * 1)).view(
                     {img.rows, img.cols, 1});
 
-            torch::Tensor label = torch::zeros({1, 28});
-
-            cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE); // Create a window for display.
-            cv::imshow("Display window", img);
-            cv::waitKey();
+            //read label
+            torch::Tensor label = torch::zeros({28});
+            std::stringstream ss;
+            ss << row[1];
+            while (true) {
+                int tmp;
+                ss >> tmp;
+                if (ss.eof())break;
+                label[tmp] = 1;
+            }
+//            cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE); // Create a window for display.
+//            cv::imshow("Display window", img);
+//            cv::waitKey();
 
             _states.push_back(image);
             _labels.push_back(label);
