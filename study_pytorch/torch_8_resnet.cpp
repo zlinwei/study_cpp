@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     }
     nn::Sequential resnet18(
             nn::Conv2d(nn::Conv2dOptions(1, 64, {7, 7}).stride(2).padding(1).with_bias(false)),
+            nn::Functional(torch::max_pool2d, 3, 2, 0, 0, false),
             nn::Functional(torch::leaky_relu, 0.2)
     );
 
