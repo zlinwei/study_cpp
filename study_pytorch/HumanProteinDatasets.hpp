@@ -57,12 +57,14 @@ private:
     void read_data(const std::string &loc) {
         //TODO read data into states and labels
         LOG(INFO) << "read csv: " << loc;
-        std::ifstream ifile(loc + "train.csv");
+        std::ifstream ifile(loc + "/train.csv");
         if (ifile.fail())throw std::runtime_error((boost::format("can not open file %s") % loc).str());
 
         CSVRow row;
         while (ifile >> row) {
-            std::string filename = loc + "train/" + row[0] + "_green.png";
+            std::string filename = loc + "/train/" + row[0] + "_green.png";
+            std::ifstream file(filename);
+            if (file.fail())continue;
             _data.emplace_back<HumanProteinDataItem>({filename, row[1]});
         }
     }
@@ -72,7 +74,7 @@ private:
     std::vector<HumanProteinDataItem> _data;
 };
 
-torch::data::Example<> HumanProteinAtlasDataset::get(size_t index) {
+torch::data::Example<torch::Tensor, torch::Tensor> HumanProteinAtlasDataset::get(size_t index) {
     const auto &item = _data.at(index);
     //read image
     auto img_ = cv::imread(item.getFilename(), cv::IMREAD_GRAYSCALE);
