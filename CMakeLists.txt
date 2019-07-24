@@ -15,7 +15,7 @@ SET(BOOST_REQUIRED_COMPONENTS
         regex
         system
         thread
-#        python3.7
+        #        python3.7
         )
 set(BOOST_MIN_VERSION "1.58")
 set(Boost_ADDITIONAL_VERSIONS
@@ -38,5 +38,6 @@ add_subdirectory(study_opencv)
 add_subdirectory(study_boost_python)
 add_subdirectory(study_pytorch)
 add_subdirectory(design_mode)
+add_subdirectory(study_algorithm)
 
 add_executable(study_cpp main.cpp)
