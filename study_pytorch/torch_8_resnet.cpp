@@ -38,7 +38,10 @@ public:
 
     torch::Tensor forward(torch::Tensor &x) {
         x = _conv1->forward(x);
+        //TODO batch normalization and relu
         x = _conv2->forward(x);
+        //TODO batch normalization and relu
+
         return x;
     }
 
