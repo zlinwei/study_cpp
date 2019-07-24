@@ -12,6 +12,7 @@
 #include <string>
 #include <iterator>
 
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <torch/torch.h>
 #include <glog/logging.h>
@@ -63,9 +64,9 @@ private:
         CSVRow row;
         while (ifile >> row) {
             std::string filename = loc + "/train/" + row[0] + "_green.png";
-            std::ifstream file(filename);
-            if (file.fail())continue;
+			if (!boost::filesystem::exists(filename)) continue;
             _data.emplace_back<HumanProteinDataItem>({filename, row[1]});
+			LOG(INFO) << filename << " " << row[1];
         }
     }
 
