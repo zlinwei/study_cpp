@@ -57,10 +57,10 @@ public:
     ResNet18Impl() :
             _conv1(nn::Conv2dOptions(1, 64, {7, 7}).stride(2)),
             _conv2_x(64, 64, 3),
-            _conv3_x(64, 64, 3),
-            _conv4_x(64, 64, 3),
-            _conv5_x(64, 64, 3),
-            _linear(64, 28) {
+            _conv3_x(64, 128, 3),
+            _conv4_x(128, 256, 3),
+            _conv5_x(256, 512, 3),
+            _linear(512, 28) {
 
     }
 
