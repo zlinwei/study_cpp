@@ -15,7 +15,7 @@ SET(BOOST_REQUIRED_COMPONENTS
         regex
         system
         thread
-        python3.7
+#        python3.7
         )
 set(BOOST_MIN_VERSION "1.58")
 set(Boost_ADDITIONAL_VERSIONS
