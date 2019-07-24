@@ -30,9 +30,15 @@ using namespace torch;
 
 class ConvBlock2Impl : public torch::nn::Module {
 public:
-    ConvBlock2Impl(int input_ch, int kernel_size, int output_ch) :
-            _conv1(nn::Conv2dOptions(input_ch, input_ch, {kernel_size, kernel_size}).stride(2)),
-            _conv2(nn::Conv2dOptions(input_ch, output_ch, {kernel_size, kernel_size}).stride(2)) {
+    ConvBlock2Impl(int input_ch, int output_ch, int kernel_size) :
+            _conv1(register_module("conv1",
+                                   nn::Conv2d(nn::Conv2dOptions(input_ch, output_ch, {kernel_size, kernel_size})
+                                                      .stride(1))
+            )),
+            _conv2(register_module("conv2", nn::Conv2d(
+                    nn::Conv2dOptions(output_ch, output_ch, {kernel_size, kernel_size})
+                            .stride(1))
+            )) {
 
     }
 
@@ -55,23 +61,25 @@ TORCH_MODULE(ConvBlock2);
 class ResNet18Impl : public torch::nn::Module {
 public:
     ResNet18Impl() :
-            _conv1(nn::Conv2dOptions(1, 64, {7, 7}).stride(2)),
-            _conv2_x(64, 64, 3),
-            _conv3_x(64, 128, 3),
-            _conv4_x(128, 256, 3),
-            _conv5_x(256, 512, 3),
+            _conv1(register_module("conv1", nn::Conv2d(nn::Conv2dOptions(1, 64, {7, 7}).stride(2)))),
+            _conv2_x(register_module("conv2_x", ConvBlock2(64, 64, 3))),
+            _conv3_x(register_module("conv3_x", ConvBlock2(64, 128, 3))),
+            _conv4_x(register_module("conv4_x", ConvBlock2(128, 256, 3))),
+            _conv5_x(register_module("conv5_x", ConvBlock2(256, 512, 3))),
             _linear(512, 28) {
 
     }
 
-    Tensor forward(Tensor &x) {
+    Tensor forward(Tensor x) {
         x = _conv1->forward(x); //top layer
         x = torch::max_pool2d(x, 3, 2); //max pool2d
         x = _conv2_x->forward(x);
         x = _conv3_x->forward(x);
         x = _conv4_x->forward(x);
         x = _conv5_x->forward(x);
-        x = torch::adaptive_avg_pool2d(x, 1);
+        LOG(INFO) << x.sizes();
+        x = torch::adaptive_avg_pool2d(x, {1, 1});
+        LOG(INFO) << x.sizes();
         x = _linear->forward(x);
         x = torch::sigmoid(x);
 
@@ -97,8 +105,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    ResNet18 resNet18 = ResNet18();
-
+    ResNet18 resNet18{};
+    LOG(INFO) << "\n" << resNet18;
     std::string path = argv[1];
     auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
     LOG(INFO) << "data size: " << *dataset.size();
