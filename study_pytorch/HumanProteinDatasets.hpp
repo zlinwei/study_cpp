@@ -64,9 +64,9 @@ private:
         CSVRow row;
         while (ifile >> row) {
             std::string filename = loc + "/train/" + row[0] + "_green.png";
-			if (!boost::filesystem::exists(filename)) continue;
+            if (!boost::filesystem::exists(filename)) continue;
             _data.emplace_back<HumanProteinDataItem>({filename, row[1]});
-			LOG(INFO) << filename << " " << row[1];
+            LOG(INFO) << filename << " " << row[1];
         }
     }
 
@@ -84,7 +84,7 @@ torch::data::Example<torch::Tensor, torch::Tensor> HumanProteinAtlasDataset::get
     cv::Mat img(512, 512, CV_8UC1);
     cv::resize(img_, img, img.size(), 0, 0, cv::INTER_AREA);
     auto image = torch::tensor(torch::ArrayRef < uint8_t > (img.data, img.rows * img.cols * 1)).view(
-            {img.rows, img.cols, 1});
+            {1, img.rows, img.cols});
 
     //read label
     torch::Tensor label = torch::zeros({28});
