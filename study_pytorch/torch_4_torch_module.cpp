@@ -71,7 +71,7 @@ TORCH_MODULE(Generator);
 int main() {
     Generator generator{};
     std::cout << generator << std::endl;
-    Net net(4, 5);
+    Net net(100, 5);
     std::cout << net << std::endl;
-    std::cout << net->forward(torch::ones({2, 4})) << std::endl;
+    std::cout << net->forward(torch::ones({30, 1, 100})) << std::endl;
 }

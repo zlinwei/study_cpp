@@ -66,7 +66,7 @@ public:
             _conv3_x(register_module("conv3_x", ConvBlock2(64, 128, 3))),
             _conv4_x(register_module("conv4_x", ConvBlock2(128, 256, 3))),
             _conv5_x(register_module("conv5_x", ConvBlock2(256, 512, 3))),
-            _linear(512, 28) {
+            _linear(register_module("linear", nn::Linear(512, 28))) {
 
     }
 
@@ -77,9 +77,8 @@ public:
         x = _conv3_x->forward(x);
         x = _conv4_x->forward(x);
         x = _conv5_x->forward(x);
-        LOG(INFO) << x.sizes();
         x = torch::adaptive_avg_pool2d(x, {1, 1});
-        LOG(INFO) << x.sizes();
+        x = x.view({x.size(0), x.size(1)});
         x = _linear->forward(x);
         x = torch::sigmoid(x);
 
