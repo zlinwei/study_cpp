@@ -57,10 +57,10 @@ public:
     ResNet18Impl() :
             _conv1(nn::Conv2dOptions(1, 64, {7, 7}).stride(2)),
             _conv2_x(64, 64, 3),
-            _conv3_x(64, 128, 3),
-            _conv4_x(128, 256, 3),
-            _conv5_x(256, 512, 3),
-            _linear(512, 28) {
+            _conv3_x(64, 64, 3),
+            _conv4_x(64, 64, 3),
+            _conv5_x(64, 64, 3),
+            _linear(64, 28) {
 
     }
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
             // Train discriminator with real images.
             resNet18->zero_grad();
             auto real_images = batch.data;
-            torch::Tensor real_labels = torch::empty(batch.data.size(0)).uniform_(0, 1.0);
+            auto real_labels = batch.target;
             torch::Tensor real_output = resNet18->forward(real_images);
             torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, real_labels);
             d_loss_real.backward();
