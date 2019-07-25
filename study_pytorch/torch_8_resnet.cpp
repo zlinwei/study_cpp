@@ -31,29 +31,36 @@ using namespace torch;
 class ConvBlock2Impl : public torch::nn::Module {
 public:
     ConvBlock2Impl(int input_ch, int output_ch, int kernel_size) :
-            _conv1(register_module("conv1",
-                                   nn::Conv2d(nn::Conv2dOptions(input_ch, output_ch, {kernel_size, kernel_size})
-                                                      .stride(1))
+            _conv1(register_module("conv1",nn::Conv2d(nn::Conv2dOptions(input_ch, output_ch, {kernel_size, kernel_size}).stride(1))
             )),
+			_bn1(register_module("bn1",
+				nn::BatchNorm(output_ch)
+				)),
             _conv2(register_module("conv2", nn::Conv2d(
                     nn::Conv2dOptions(output_ch, output_ch, {kernel_size, kernel_size})
                             .stride(1))
-            )) {
+            )),
+			_bn2(register_module("bn2",nn::BatchNorm(output_ch))){
 
     }
 
     torch::Tensor forward(torch::Tensor &x) {
         x = _conv1->forward(x);
-        //TODO batch normalization and relu
+		x = _bn1->forward(x);
+		x = torch::relu(x);
+
         x = _conv2->forward(x);
-        //TODO batch normalization and relu
+		x = _bn2->forward(x);
+		x = torch::relu(x);
 
         return x;
     }
 
 private:
-    nn::Conv2d _conv1;
-    nn::Conv2d _conv2;
+	nn::Conv2d _conv1{ nullptr };
+	nn::BatchNorm _bn1{ nullptr };
+	nn::Conv2d _conv2{ nullptr };
+	nn::BatchNorm _bn2{ nullptr };
 };
 
 TORCH_MODULE(ConvBlock2);
