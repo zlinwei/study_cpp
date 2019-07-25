@@ -104,45 +104,52 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    ResNet18 resNet18{};
-    LOG(INFO) << "\n" << resNet18;
-    std::string path = argv[1];
-    auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
-    LOG(INFO) << "data size: " << *dataset.size();
-    // data loader
-    auto data_loader = torch::data::make_data_loader<>(std::move(dataset),
-                                                       torch::data::DataLoaderOptions().batch_size(64).workers(2));
+	try
+	{
+		ResNet18 resNet18{};
+		LOG(INFO) << "\n" << resNet18;
+		std::string path = argv[1];
+		auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
+		LOG(INFO) << "data size: " << *dataset.size();
+		// data loader
+		auto data_loader = torch::data::make_data_loader<>(std::move(dataset),
+			torch::data::DataLoaderOptions().batch_size(64).workers(2));
 
 
-    for (torch::data::Example<> &batch : *data_loader) {
-        //size 0 is batch size
-        LOG(INFO) << "Batch size: " << batch.data.size(0) << " | Labels: "
-                  << batch.target.size(0) << std::endl;
+		for (torch::data::Example<>& batch : *data_loader) {
+			//size 0 is batch size
+			LOG(INFO) << "Batch size: " << batch.data.size(0) << " | Labels: "
+				<< batch.target.size(0) << std::endl;
 
-        LOG(INFO) << batch.data.sizes();
-        LOG(INFO) << batch.target.sizes();
-        std::cout << std::endl;
-    }
+			LOG(INFO) << batch.data.sizes();
+			LOG(INFO) << batch.target.sizes();
+			std::cout << std::endl;
+		}
 
-    torch::optim::Adam generator_optimizer(
-            resNet18->parameters(), torch::optim::AdamOptions(2e-4).beta1(0.5));
-    torch::optim::Adam discriminator_optimizer(
-            resNet18->parameters(), torch::optim::AdamOptions(5e-4).beta1(0.5));
+		torch::optim::Adam generator_optimizer(
+			resNet18->parameters(), torch::optim::AdamOptions(2e-4).beta1(0.5));
+		torch::optim::Adam discriminator_optimizer(
+			resNet18->parameters(), torch::optim::AdamOptions(5e-4).beta1(0.5));
 
-    for (int64_t epoch = 1; epoch <= 10; ++epoch) {
-        int64_t batch_index = 0;
-        for (auto &batch : *data_loader) {
-            // Train discriminator with real images.
-            resNet18->zero_grad();
-            auto real_images = batch.data;
-            auto real_labels = batch.target;
-            torch::Tensor real_output = resNet18->forward(real_images);
-            torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, real_labels);
-            d_loss_real.backward();
+		for (int64_t epoch = 1; epoch <= 10; ++epoch) {
+			int64_t batch_index = 0;
+			for (auto& batch : *data_loader) {
+				// Train discriminator with real images.
+				resNet18->zero_grad();
+				auto real_images = batch.data;
+				auto real_labels = batch.target;
+				torch::Tensor real_output = resNet18->forward(real_images);
+				torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, real_labels);
+				d_loss_real.backward();
 
-            LOG(INFO) << batch_index++;
-        }
-    }
+				LOG(INFO) << batch_index++;
+			}
+		}
+	}
+	catch (const std::exception& e)
+	{
+		LOG(INFO) << e.what();
+	}
 
     return 0;
 }
