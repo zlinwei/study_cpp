@@ -104,7 +104,6 @@ private:
 
 TORCH_MODULE(ResNet18);
 
-torch::data::datasets::MNIST;
 
 
 int main(int argc, char *argv[]) {
