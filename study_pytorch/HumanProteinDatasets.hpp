@@ -46,8 +46,8 @@ public:
 class HumanProteinAtlasDataset :
         public torch::data::Dataset<HumanProteinAtlasDataset> {
 public:
-    explicit HumanProteinAtlasDataset(const std::string &loc) {
-        read_data(loc);
+    explicit HumanProteinAtlasDataset(const std::string &loc, size_t size = 0){
+        read_data(loc,size);
     }
 
     torch::data::Example<> get(size_t index) override;
@@ -55,18 +55,20 @@ public:
     c10::optional<size_t> size() const override;
 
 private:
-    void read_data(const std::string &loc) {
+    void read_data(const std::string &loc,size_t size) {
         //TODO read data into states and labels
         LOG(INFO) << "read csv: " << loc;
         std::ifstream ifile(loc + "/train.csv");
         if (ifile.fail())throw std::runtime_error((boost::format("can not open file %s") % loc).str());
 
         CSVRow row;
+		size_t tmp = size;
         while (ifile >> row) {
             std::string filename = loc + "/train/" + row[0] + "_green.png";
             if (!boost::filesystem::exists(filename)) continue;
             _data.emplace_back<HumanProteinDataItem>({filename, row[1]});
-            LOG(INFO) << filename << " " << row[1];
+            //LOG(INFO) << filename << " " << row[1];
+			if (size != 0 && --tmp <= 0)break;
         }
     }
 
@@ -81,10 +83,10 @@ torch::data::Example<torch::Tensor, torch::Tensor> HumanProteinAtlasDataset::get
     auto img_ = cv::imread(item.getFilename(), cv::IMREAD_GRAYSCALE);
     if (img_.empty())
         throw std::runtime_error((boost::format("image: %s is not valid") % item.getFilename()).str());
-    cv::Mat img(512, 512, CV_8UC1);
-    cv::resize(img_, img, img.size(), 0, 0, cv::INTER_AREA);
-    auto image = torch::tensor(torch::ArrayRef < uint8_t > (img.data, img.rows * img.cols * 1)).view(
-            {1, img.rows, img.cols}).to(at::kFloat);
+
+    auto image = torch::tensor(torch::ArrayRef < uint8_t > (img_.data, img_.rows * img_.cols * 1)).view(
+            {1, img_.rows, img_.cols}).to(at::kFloat).div(255);
+
 
     //read label
     torch::Tensor label = torch::zeros({28}).to(at::kFloat);
@@ -96,7 +98,7 @@ torch::data::Example<torch::Tensor, torch::Tensor> HumanProteinAtlasDataset::get
         if (ss.eof())break;
         label[tmp] = 1;
     }
-    return {image, label};
+    return { image.clone(), label.clone()};
 }
 
 c10::optional<size_t> HumanProteinAtlasDataset::size() const {
