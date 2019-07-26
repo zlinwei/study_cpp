@@ -40,12 +40,12 @@ public:
      * @param A: an integer array
      * @return: nothing
      */
-    void sortIntegers2(vector<int> &A) {
+    static void sortIntegers2(vector<int> &A) {
         // write your code here
         QSort(A.data(), 0, A.size() - 1);
     }
 
-    void QSort(int arr[], int low, int high) {
+    static void QSort(int arr[], int low, int high) {
         if (high <= low) return;
         int i = low;
         int j = high + 1;
@@ -74,9 +74,8 @@ public:
 };
 
 int main(int, char *[]) {
-    Solution solution{};
     vector<int> a = {3, 2, 1, 4, 5, 2};
-    solution.sortIntegers2(a);
+    Solution::sortIntegers2(a);
     cout << "output: \n";
     for (auto &item: a) {
         cout << item << " ";
