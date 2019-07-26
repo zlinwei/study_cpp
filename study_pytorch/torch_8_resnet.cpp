@@ -88,7 +88,7 @@ public:
         x = torch::adaptive_avg_pool2d(x, {1, 1});
         x = x.view({x.size(0), x.size(1)});
         x = _linear->forward(x);
-        x = torch::sigmoid(x);
+        x = torch::softmax(x, 1);
 
         return x;
     }
@@ -116,14 +116,12 @@ int main(int argc, char *argv[]) {
         ResNet18 resNet18{};
         LOG(INFO) << "\n" << resNet18;
 
-        torch::optim::Adam generator_optimizer(
+        torch::optim::Adam optimizer(
                 resNet18->parameters(), torch::optim::AdamOptions(2e-4).beta1(0.5));
-        torch::optim::Adam discriminator_optimizer(
-                resNet18->parameters(), torch::optim::AdamOptions(5e-4).beta1(0.5));
 
         std::string path = argv[1];
 //        auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
-        auto dataset = HumanProteinAtlasDataset(path, 1000);
+        auto dataset = HumanProteinAtlasDataset(path);
         LOG(INFO) << "data size: " << *dataset.size();
 
         // data loader
@@ -136,8 +134,12 @@ int main(int argc, char *argv[]) {
         for (int64_t epoch = 1; epoch <= 10; ++epoch) {
             const size_t total_samp = dataset.size().value();
             size_t samp_index = 0;
+
+            LOG(INFO) << "zero_grad() before a batch";
             while (true) {
+                resNet18->zero_grad();
                 for (int i = 0; i < batch_size; ++i) {
+                    LOG(INFO) << "get sample: " << samp_index;
                     auto data = dataset.get(samp_index);
                     auto image = data.data.view({1, 1, 512, 512});
                     auto label = data.target.view({1, 1, 28});
@@ -145,14 +147,15 @@ int main(int argc, char *argv[]) {
                     torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, label);
                     d_loss_real.backward();
                     LOG(INFO) << d_loss_real;
+
                     samp_index++;
-                    if (samp_index > total_samp)break;
+                    if (samp_index >= total_samp)break;
                 }
 
-                LOG(INFO) << "zero grad";
-                resNet18->zero_grad();
+                LOG(INFO) << "optimizer step()";
+                optimizer.step();
 
-                if (samp_index > total_samp)break;
+                if (samp_index >= total_samp)break;
             }
 //            for (auto &batch : *data_loader) {
 //                LOG(INFO) << "Batch size: " << batch.data.sizes() << " | Labels: "
