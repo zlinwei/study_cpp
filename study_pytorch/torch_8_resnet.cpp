@@ -149,12 +149,14 @@ int main(int argc, char *argv[]) {
             LOG(INFO) << "zero_grad() before a batch";
             while (true) {
                 resNet18->zero_grad();
+				torch::Tensor label;
+				torch::Tensor real_output;
                 for (int i = 0; i < batch_size; ++i) {
                     LOG(INFO) << "get sample: " << samp_index;
                     auto data = dataset.get(samp_index);
                     auto image = data.data.view({1, 1, 512, 512});
-                    auto label = data.target.view({1, 1, 28});
-                    torch::Tensor real_output = resNet18->forward(image);
+                    label = data.target.view({1, 1, 28});
+                    real_output = resNet18->forward(image);
                     torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, label);
                     d_loss_real.backward();
                     LOG(INFO) << d_loss_real;

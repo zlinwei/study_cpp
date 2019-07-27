@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <iterator>
+#include <random>
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
@@ -48,6 +49,7 @@ class HumanProteinAtlasDataset :
 public:
     explicit HumanProteinAtlasDataset(const std::string &loc, size_t size = 0){
         read_data(loc,size);
+		std::shuffle(_data.begin(), _data.end(), std::mt19937(std::random_device()()));
     }
 
     torch::data::Example<> get(size_t index) override;
