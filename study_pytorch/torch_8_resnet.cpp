@@ -155,6 +155,10 @@ int main(int argc, char *argv[]) {
                 LOG(INFO) << "optimizer step()";
                 optimizer.step();
 
+                LOG(INFO) << "save to file";
+                torch::save(resNet18, "resNet18-checkpoint.pt");
+                torch::save(optimizer, "resNet18-optimizer-checkpoint.pt");
+
                 if (samp_index >= total_samp)break;
             }
 //            for (auto &batch : *data_loader) {
