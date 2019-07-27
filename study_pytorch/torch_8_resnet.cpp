@@ -119,6 +119,17 @@ int main(int argc, char *argv[]) {
         torch::optim::Adam optimizer(
                 resNet18->parameters(), torch::optim::AdamOptions(2e-4).beta1(0.5));
 
+
+        //try to load module
+        try {
+            torch::load(resNet18, "resNet18-checkpoint.pt");
+            torch::load(optimizer, "resNet18-optimizer-checkpoint.pt");
+        } catch (std::exception &e) {
+            LOG(INFO) << e.what();
+        } catch (...) {
+            LOG(INFO) << "Uncaught error";
+        }
+
         std::string path = argv[1];
 //        auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
         auto dataset = HumanProteinAtlasDataset(path);
@@ -151,6 +162,9 @@ int main(int argc, char *argv[]) {
                     samp_index++;
                     if (samp_index >= total_samp)break;
                 }
+
+                LOG(INFO) << "label: " << label;
+                LOG(INFO) << "predict: " << real_output;
 
                 LOG(INFO) << "optimizer step()";
                 optimizer.step();
