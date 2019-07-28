@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(study_cpp)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # BOOST
 set(Boost_USE_STATIC_LIBS OFF)
@@ -39,5 +39,5 @@ add_subdirectory(study_boost_python)
 add_subdirectory(study_pytorch)
 add_subdirectory(design_mode)
 add_subdirectory(study_algorithm)
-
+add_subdirectory(study_libuv)
 add_executable(study_cpp main.cpp)

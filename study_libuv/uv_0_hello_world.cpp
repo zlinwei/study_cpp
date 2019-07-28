@@ -1,0 +1,19 @@
+//
+// Created by linwei on 2019-07-28.
+//
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <uv.h>
+
+int main() {
+    auto *loop = (uv_loop_t *) malloc(sizeof(uv_loop_t));
+    uv_loop_init(loop);
+
+    printf("Now quitting.\n");
+    uv_run(loop, UV_RUN_DEFAULT);
+
+    uv_loop_close(loop);
+    free(loop);
+    return 0;
+}
