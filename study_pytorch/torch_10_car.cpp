@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         LOG(INFO) << "\n" << resNet18;
 
         torch::optim::Adam optimizer(
-                resNet18->parameters(), torch::optim::AdamOptions(2e-4).beta1(0.5));
+                resNet18->parameters(), torch::optim::AdamOptions(2e-3).beta1(0.5));
 
 
         //try to load module
@@ -66,19 +66,19 @@ int main(int argc, char *argv[]) {
                     d_loss_real.backward();
                     LOG(INFO) << d_loss_real;
 
+                    LOG(INFO) << "label: \n" << label;
+                    LOG(INFO) << "predict: \n" << real_output;
+                    LOG(INFO) << "optimizer step()";
+                    optimizer.step();
+                    resNet18->zero_grad();
+                    LOG(INFO) << "save to file";
+                    torch::save(resNet18, "car-checkpoint.pt");
+                    torch::save(optimizer, "car-optimizer-checkpoint.pt");
+
                     samp_index++;
                     if (samp_index >= total_samp)break;
                 }
 
-                LOG(INFO) << "label: \n" << label;
-                LOG(INFO) << "predict: \n" << real_output;
-
-                LOG(INFO) << "optimizer step()";
-                optimizer.step();
-
-                LOG(INFO) << "save to file";
-                torch::save(resNet18, "car-checkpoint.pt");
-                torch::save(optimizer, "car-optimizer-checkpoint.pt");
 
                 if (samp_index >= total_samp)break;
             }
