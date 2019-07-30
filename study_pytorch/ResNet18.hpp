@@ -54,13 +54,13 @@ TORCH_MODULE(ConvBlock2);
 
 class ResNet18Impl : public torch::nn::Module {
 public:
-    ResNet18Impl() :
-            _conv1(register_module("conv1", nn::Conv2d(nn::Conv2dOptions(1, 64, {7, 7}).stride(2)))),
+    ResNet18Impl(int ch = 1, int cl = 28) :
+            _conv1(register_module("conv1", nn::Conv2d(nn::Conv2dOptions(ch, 64, {7, 7}).stride(2)))),
             _conv2_x(register_module("conv2_x", ConvBlock2(64, 64, 3))),
             _conv3_x(register_module("conv3_x", ConvBlock2(64, 128, 3))),
             _conv4_x(register_module("conv4_x", ConvBlock2(128, 256, 3))),
             _conv5_x(register_module("conv5_x", ConvBlock2(256, 512, 3))),
-            _linear(register_module("linear", nn::Linear(512, 28))) {
+            _linear(register_module("linear", nn::Linear(512, cl))) {
 
     }
 

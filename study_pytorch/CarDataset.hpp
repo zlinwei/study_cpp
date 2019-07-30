@@ -5,6 +5,7 @@
 #ifndef STUDY_CPP_CARDATASET_HPP
 #define STUDY_CPP_CARDATASET_HPP
 
+#include <random>
 #include <boost/format.hpp>
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
@@ -59,6 +60,8 @@ public:
         }
 
         txt.close();
+
+        std::shuffle(_data.begin(), _data.end(), std::mt19937(std::random_device()()));
     }
 
 
