@@ -47,7 +47,7 @@ public:
 class HumanProteinAtlasDataset :
         public torch::data::Dataset<HumanProteinAtlasDataset> {
 public:
-    explicit HumanProteinAtlasDataset(const std::string &loc, size_t size = 0){
+    HumanProteinAtlasDataset(const std::string &loc, size_t size = 0){
         read_data(loc,size);
 		std::shuffle(_data.begin(), _data.end(), std::mt19937(std::random_device()()));
     }
