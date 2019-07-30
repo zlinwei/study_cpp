@@ -18,8 +18,9 @@ int main(int argc, char *argv[]) {
     LOG(INFO) << "data size: " << *dataset.size();
     for (int i = 0; i < *dataset.size(); ++i) {
         auto item = dataset.get(i);
-        LOG(INFO) << item.data;
-        LOG(INFO) << item.target;
+        std::cout << item.data.sizes() << "\n";
+        std::cout << item.target << "\n";
     }
+    std::cout << std::endl;
     return 0;
 }

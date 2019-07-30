@@ -73,8 +73,12 @@ public:
             throw std::runtime_error((boost::format("image: %s is not valid") % item.getFilename()).str());
         }
 
-        torch::Tensor image = torch::tensor(torch::ArrayRef < uint8_t > (img.data, img.rows * img.cols * 3)).view(
-                {3, img.rows, img.cols}).to(at::kFloat).div(255);
+        cv::resize(img, img, {512, 512});
+        torch::Tensor image = torch::tensor(
+                torch::ArrayRef < uint8_t > (img.data, img.rows * img.cols * 3))
+                .view({3, img.rows, img.cols})
+                .to(at::kFloat)
+                .div(255);
 
 
         torch::Tensor brand_label = torch::zeros({3}, torch::kFloat);
