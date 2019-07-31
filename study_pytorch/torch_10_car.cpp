@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         LOG(INFO) << "data loader created";
 
         const int batch_size = 8;
-        for (int64_t epoch = 1; epoch <= 10; ++epoch) {
+        for (int64_t epoch = 1; epoch <= 1000; ++epoch) {
             const size_t total_samp = dataset.size().value();
             size_t samp_index = 0;
 

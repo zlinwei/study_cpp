@@ -39,6 +39,11 @@ private:
 
 };
 
+class CarNet : public torch::nn::Module{
+
+};
+
+
 class CarDataset : public torch::data::Dataset<CarDataset> {
 public:
     explicit CarDataset(const std::string &path) {
