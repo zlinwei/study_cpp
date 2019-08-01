@@ -64,6 +64,7 @@ public:
         x = _fc0->forward(x);
         x = torch::dropout(x, 0.5, is_training());
         x = _fc1->forward(x);
+        x = torch::argmax(x, 1);
         return x;
     }
 
