@@ -17,76 +17,48 @@ int main(int argc, char *argv[]) {
 //
 
     try {
-		CarNet carNet{ 3,2 };//suv or xxx
+        CarNet carNet{3, 1};//input ch 3, output 1
         LOG(INFO) << "\n" << carNet;
 
         torch::optim::Adam optimizer(
-			carNet->parameters(), torch::optim::AdamOptions(2e-3).beta1(0.5));
+                carNet->parameters(), torch::optim::AdamOptions(0.01).beta1(0.9));
 
 
         //try to load module
-        try {
-            torch::load(carNet, "car-checkpoint.pt");
-            torch::load(optimizer, "car-optimizer-checkpoint.pt");
-        } catch (std::exception &e) {
-            LOG(INFO) << e.what();
-        } catch (...) {
-            LOG(INFO) << "Uncaught error";
-        }
+//        try {
+//            torch::load(carNet, "car-checkpoint.pt");
+//            torch::load(optimizer, "car-optimizer-checkpoint.pt");
+//        } catch (std::exception &e) {
+//            LOG(INFO) << e.what();
+//        } catch (...) {
+//            LOG(INFO) << "Uncaught error";
+//        }
 
-//        auto dataset = HumanProteinAtlasDataset(path).map(torch::data::transforms::Stack<>());
-        auto dataset = CarDataset(path);
+        auto dataset = CarDataset(path).map(torch::data::transforms::Stack<>());
+//        auto dataset = CarDataset(path);
         LOG(INFO) << "data size: " << *dataset.size();
 
         // data loader
-//        auto data_loader = torch::data::make_data_loader<>(std::move(dataset),
-//                                                           torch::data::DataLoaderOptions().batch_size(1).workers(4));
+        auto data_loader = torch::data::make_data_loader<>(std::move(dataset),
+                                                           torch::data::DataLoaderOptions()
+                                                                   .batch_size(8).workers(4));
 
         LOG(INFO) << "data loader created";
 
-        const int batch_size = 8;
-        for (int64_t epoch = 1; epoch <= 1000; ++epoch) {
-            const size_t total_samp = dataset.size().value();
-            size_t samp_index = 0;
-			
-            LOG(INFO) << "zero_grad() before a batch";
-            while (true) {
-				carNet->zero_grad();
-                torch::Tensor label;
-                torch::Tensor real_output;
-                for (int i = 0; i < batch_size; ++i) {
-                    LOG(INFO) << "get sample: " << samp_index;
-                    auto data = dataset.get(samp_index);
-                    LOG(INFO) << data.data.sizes();
-                    LOG(INFO) << data.target.sizes();
-                    auto image = data.data.view({1, 3, 512, 512});
-                    label = data.target.view({1, 1, 2});
-                    real_output = carNet->forward(image);
+        for (int epoch = 0; epoch < 1000; ++epoch) {
+            for (auto &batch: *data_loader) {
+                optimizer.zero_grad();
+                torch::Tensor images = batch.data;
+                torch::Tensor output = carNet->forward(images);
+                torch::Tensor labels = batch.target;
+                torch::Tensor loss = torch::binary_cross_entropy(output, labels);
+                LOG(INFO) << "loss: " << loss.item<float>();
+                loss.backward();
+                optimizer.step();
 
-					LOG(INFO) << "label: \n" << label;
-					LOG(INFO) << "predict: \n" << real_output;
-
-					//torch::Tensor d_loss_real = torch::mse_loss(real_output, label);
-                    torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, label);
-                    //d_loss_real.backward();
-                    //LOG(INFO) << d_loss_real;
-
-                    LOG(INFO) << "optimizer step()";
-                    optimizer.step();
-					carNet->zero_grad();
-                    LOG(INFO) << "save to file";
-                    torch::save(carNet, "car-checkpoint.pt");
-                    torch::save(optimizer, "car-optimizer-checkpoint.pt");
-
-                    samp_index++;
-                    if (samp_index >= total_samp)break;
-                }
-
-
-                if (samp_index >= total_samp)break;
             }
-
         }
+
     }
     catch (const std::exception &e) {
         LOG(INFO) << e.what();

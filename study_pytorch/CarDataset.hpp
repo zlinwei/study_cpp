@@ -41,40 +41,88 @@ private:
 
 class CarNetImpl : public torch::nn::Module {
 public:
-	CarNetImpl(int ch, int classes) {
-		_conv0 = register_module("conv_0", nn::Conv2d(nn::Conv2dOptions(ch, 20, { 5, 5 })));
-		_conv1 = register_module("conv_1", nn::Conv2d(nn::Conv2dOptions(20, 40, { 4, 4 })));
-		_conv2 = register_module("conv_2", nn::Conv2d(nn::Conv2dOptions(40, 60, { 3, 3 })));
-		_fc0 = register_module("fc0", nn::Linear(60, 100));
-		_fc1 = register_module("fc1", nn::Linear(100, classes));
-	}
+    CarNetImpl(int ch, int classes) {
+        //Layer 0
+        _conv_0 = register_module("conv_0",
+                                  nn::Conv2d(nn::Conv2dOptions(ch, 64, 4)
+                                                     .stride(2)
+                                                     .padding(1)
+                                                     .with_bias(false)));
+        _relu_0 = register_module("relu_0",
+                                  nn::Functional(torch::leaky_relu, 0.2));
+
+        //Layer 1
+        _conv_1 = register_module("conv_1",
+                                  nn::Conv2d(nn::Conv2dOptions(64, 128, 4)
+                                                     .stride(2)
+                                                     .padding(1)
+                                                     .with_bias(false)));
+        _bn_1 = register_module("bn_1",
+                                nn::BatchNorm(nn::BatchNormOptions(128)));
+        _relu_1 = register_module("relu_1",
+                                  nn::Functional(torch::leaky_relu, 0.2));
+
+        //Layer 2
+        _conv_2 = register_module("conv_2",
+                                  nn::Conv2d(nn::Conv2dOptions(128, 256, 4)
+                                                     .stride(2)
+                                                     .padding(1)
+                                                     .with_bias(false)));
+        _bn_2 = register_module("bn_2",
+                                nn::BatchNorm(nn::BatchNormOptions(256)));
+        _relu_2 = register_module("relu_2",
+                                  nn::Functional(torch::leaky_relu, 0.2));
+
+        //Layer 3
+        _conv_3 = register_module("conv_3",
+                                  nn::Conv2d(
+                                          nn::Conv2dOptions(256, 1, 3)
+                                                  .stride(2)
+                                                  .padding(0)
+                                                  .with_bias(false)));
+        _fc_3 = register_module("fc_3", nn::Linear(961, 1));
+        _sigmoid = register_module("sigmoid", nn::Functional(torch::sigmoid));
+    }
 
     torch::Tensor forward(torch::Tensor x) {
-        x = _conv0->forward(x);
-        x = torch::relu(x);
-        x = torch::max_pool2d(x, {2, 2}, {2, 2});
-        x = _conv1->forward(x);
-        x = torch::relu(x);
-        x = torch::max_pool2d(x, {2, 2}, {2, 2});
-        x = _conv2->forward(x);
-        x = torch::relu(x);
-        x = torch::max_pool2d(x, {2, 2}, {2, 2});
-        x = torch::adaptive_avg_pool2d(x, {1, 1});
-        x = x.view({x.size(0), x.size(1)});
-        x = _fc0->forward(x);
-        x = torch::dropout(x, 0.5, is_training());
-        x = _fc1->forward(x);
-        x = torch::softmax(x, 1);
+        //Layer 0
+        x = _conv_0->forward(x);
+        x = _relu_0->forward(x);
+        //Layer 1
+        x = _conv_1->forward(x);
+        x = _bn_1->forward(x);
+        x = _relu_1->forward(x);
+        //Layer 2
+        x = _conv_2->forward(x);
+        x = _bn_2->forward(x);
+        x = _relu_2->forward(x);
+        //Layer 3
+        x = _conv_3->forward(x);
+        x = x.reshape({x.size(0), -1});
+        x = _fc_3->forward(x);
+        x = _sigmoid->forward(x);
         return x;
     }
 
 private:
-    torch::nn::Conv2d _conv0{nullptr}; //chan=20,kernel_size=5,relu, max_pool 2x2 2x2
-    torch::nn::Conv2d _conv1{nullptr}; //chan=40,kernel_size=4,relu, max_pool 2x2 2x2
-    torch::nn::Conv2d _conv2{nullptr}; //chan=60,kernel_size=3,relu, max_pool 2x2 2x2
-    torch::nn::Linear _fc0{nullptr}; //output=100,dropout
-    torch::nn::Linear _fc1{nullptr};
+    // Layer 0
+    torch::nn::Conv2d _conv_0{nullptr};
+    torch::nn::Functional _relu_0{nullptr};
+    // Layer 1
+    torch::nn::Conv2d _conv_1{nullptr};
+    torch::nn::BatchNorm _bn_1{nullptr};
+    torch::nn::Functional _relu_1{nullptr};
 
+    // Layer 2
+    torch::nn::Conv2d _conv_2{nullptr};
+    torch::nn::BatchNorm _bn_2{nullptr};
+    torch::nn::Functional _relu_2{nullptr};
+
+    // Layer 3
+    torch::nn::Conv2d _conv_3{nullptr};
+    torch::nn::Linear _fc_3{nullptr};
+
+    torch::nn::Functional _sigmoid{nullptr};
 };
 
 
@@ -125,13 +173,13 @@ public:
                 .div(255);
 
 
-        torch::Tensor brand_label = torch::zeros({3}, torch::kFloat);
-        brand_label[item.getBrand()] = 1.f;
-        torch::Tensor type_label = torch::zeros({2}, torch::kFloat);
-        type_label[item.getType()] = 1.f;
+//        torch::Tensor brand_label = torch::zeros({3}, torch::kFloat);
+//        brand_label[item.getBrand()] = 1.f;
+
+        torch::Tensor type_label = torch::zeros({1}, torch::kFloat);
+        type_label[0] = item.getType();
 
         return {image.clone(), type_label.clone()};
-
     }
 
 
