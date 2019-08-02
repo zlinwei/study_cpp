@@ -17,16 +17,16 @@ int main(int argc, char *argv[]) {
 //
 
     try {
-        ResNet18 resNet18{3, 2};
-        LOG(INFO) << "\n" << resNet18;
+		CarNet carNet{ 3,2 };//suv or xxx
+        LOG(INFO) << "\n" << carNet;
 
         torch::optim::Adam optimizer(
-                resNet18->parameters(), torch::optim::AdamOptions(2e-3).beta1(0.5));
+			carNet->parameters(), torch::optim::AdamOptions(2e-3).beta1(0.5));
 
 
         //try to load module
         try {
-            torch::load(resNet18, "car-checkpoint.pt");
+            torch::load(carNet, "car-checkpoint.pt");
             torch::load(optimizer, "car-optimizer-checkpoint.pt");
         } catch (std::exception &e) {
             LOG(INFO) << e.what();
@@ -48,10 +48,10 @@ int main(int argc, char *argv[]) {
         for (int64_t epoch = 1; epoch <= 1000; ++epoch) {
             const size_t total_samp = dataset.size().value();
             size_t samp_index = 0;
-
+			
             LOG(INFO) << "zero_grad() before a batch";
             while (true) {
-                resNet18->zero_grad();
+				carNet->zero_grad();
                 torch::Tensor label;
                 torch::Tensor real_output;
                 for (int i = 0; i < batch_size; ++i) {
@@ -61,18 +61,21 @@ int main(int argc, char *argv[]) {
                     LOG(INFO) << data.target.sizes();
                     auto image = data.data.view({1, 3, 512, 512});
                     label = data.target.view({1, 1, 2});
-                    real_output = resNet18->forward(image);
-                    torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, label);
-                    d_loss_real.backward();
-                    LOG(INFO) << d_loss_real;
+                    real_output = carNet->forward(image);
 
-                    LOG(INFO) << "label: \n" << label;
-                    LOG(INFO) << "predict: \n" << real_output;
+					LOG(INFO) << "label: \n" << label;
+					LOG(INFO) << "predict: \n" << real_output;
+
+					//torch::Tensor d_loss_real = torch::mse_loss(real_output, label);
+                    torch::Tensor d_loss_real = torch::binary_cross_entropy(real_output, label);
+                    //d_loss_real.backward();
+                    //LOG(INFO) << d_loss_real;
+
                     LOG(INFO) << "optimizer step()";
                     optimizer.step();
-                    resNet18->zero_grad();
+					carNet->zero_grad();
                     LOG(INFO) << "save to file";
-                    torch::save(resNet18, "car-checkpoint.pt");
+                    torch::save(carNet, "car-checkpoint.pt");
                     torch::save(optimizer, "car-optimizer-checkpoint.pt");
 
                     samp_index++;
