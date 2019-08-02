@@ -21,18 +21,18 @@ int main(int argc, char *argv[]) {
         LOG(INFO) << "\n" << carNet;
 
         torch::optim::Adam optimizer(
-                carNet->parameters(), torch::optim::AdamOptions(0.01).beta1(0.9));
+                carNet->parameters(), torch::optim::AdamOptions(1e-4));
 
 
         //try to load module
-//        try {
-//            torch::load(carNet, "car-checkpoint.pt");
-//            torch::load(optimizer, "car-optimizer-checkpoint.pt");
-//        } catch (std::exception &e) {
-//            LOG(INFO) << e.what();
-//        } catch (...) {
-//            LOG(INFO) << "Uncaught error";
-//        }
+        try {
+            torch::load(carNet, "car-checkpoint.pt");
+            torch::load(optimizer, "car-optimizer-checkpoint.pt");
+        } catch (std::exception &e) {
+            LOG(INFO) << e.what();
+        } catch (...) {
+            LOG(INFO) << "Uncaught error";
+        }
 
         auto dataset = CarDataset(path).map(torch::data::transforms::Stack<>());
 //        auto dataset = CarDataset(path);
@@ -51,12 +51,18 @@ int main(int argc, char *argv[]) {
                 torch::Tensor images = batch.data;
                 torch::Tensor output = carNet->forward(images);
                 torch::Tensor labels = batch.target;
+                LOG(INFO) << labels;
+                LOG(INFO) << output;
                 torch::Tensor loss = torch::binary_cross_entropy(output, labels);
                 LOG(INFO) << "loss: " << loss.item<float>();
                 loss.backward();
                 optimizer.step();
 
             }
+
+            torch::save(carNet, "car-checkpoint.pt");
+            torch::save(optimizer, "car-optimizer-checkpoint.pt");
+            LOG(INFO) << "save to file";
         }
 
     }
