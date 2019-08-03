@@ -80,6 +80,8 @@ public:
                                                   .stride(2)
                                                   .padding(0)
                                                   .with_bias(false)));
+
+        _dropout = register_module("dropout", nn::Dropout(nn::DropoutOptions(0.5)));
         _fc_3 = register_module("fc_3", nn::Linear(961, 1));
         _sigmoid = register_module("sigmoid", nn::Functional(torch::sigmoid));
     }
@@ -99,6 +101,7 @@ public:
         //Layer 3
         x = _conv_3->forward(x);
         x = x.reshape({x.size(0), -1});
+        x = _dropout->forward(x);
         x = _fc_3->forward(x);
         x = _sigmoid->forward(x);
         return x;
@@ -121,6 +124,7 @@ private:
     // Layer 3
     torch::nn::Conv2d _conv_3{nullptr};
     torch::nn::Linear _fc_3{nullptr};
+    torch::nn::Dropout _dropout{nullptr};
 
     torch::nn::Functional _sigmoid{nullptr};
 };
