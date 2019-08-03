@@ -82,7 +82,7 @@ public:
                                                   .with_bias(false)));
 
         _dropout = register_module("dropout", nn::Dropout(nn::DropoutOptions(0.5)));
-        _fc_3 = register_module("fc_3", nn::Linear(961, 1));
+        _fc_3 = register_module("fc_3", nn::Linear(961, 2));
         _sigmoid = register_module("sigmoid", nn::Functional(torch::sigmoid));
     }
 
@@ -180,8 +180,13 @@ public:
 //        torch::Tensor brand_label = torch::zeros({3}, torch::kFloat);
 //        brand_label[item.getBrand()] = 1.f;
 
-        torch::Tensor type_label = torch::zeros({1}, torch::kFloat);
-        type_label[0] = item.getType();
+//        torch::Tensor type_label = torch::zeros({1}, torch::kFloat);
+//        type_label[0] = item.getType();
+        long classes = 2;
+        torch::Tensor zeros = torch::zeros(classes);
+        torch::Tensor label = torch::empty(1, torch::kLong);
+        label[0] = item.getType();
+        auto type_label = zeros.scatter_(0, label, 1);
 
         return {image.clone(), type_label.clone()};
     }

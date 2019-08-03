@@ -29,5 +29,11 @@ int main(int, char *[]) {
 
     torch::Device device(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
 
+    auto label = torch::zeros(1,torch::kLong);
+    label[0] = 3;
+    auto one_hot = torch::zeros(5);
+    auto target = one_hot.scatter_(0, label, 1);
+    LOG(INFO) << target;
+
     return 0;
 }
