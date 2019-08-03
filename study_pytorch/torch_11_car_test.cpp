@@ -46,8 +46,10 @@ int main(int argc, char *argv[]) {
             torch::Tensor output = carNet->forward(images);
             torch::Tensor labels = batch.target;
 //            output = torch::argmax(output);
-            LOG(INFO) << labels.item<float>();
-            LOG(INFO) << output.item<float>();
+            LOG(INFO) << labels;
+            LOG(INFO) << output;
+            torch::Tensor loss = torch::binary_cross_entropy(output, labels);
+            LOG(INFO) << "loss: " << loss.item<float>();
             LOG(INFO) << "\n";
         }
 
