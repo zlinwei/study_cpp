@@ -80,7 +80,7 @@ message(STATUS "${ProtoGRPCHeaders}")
 message(STATUS "${PROTO_SRCS}")
 message(STATUS "${PROTO_HDRS}")
 add_library(greeter_pb ${PROTO_SRCS})
-target_link_libraries(greeter_pb ${Protobuf_LIBRARIES} protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite gRPC::gpr gRPC::grpc gRPC::grpc++ gRPC::grpc_cronet)
+target_link_libraries(greeter_pb protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite gRPC::gpr gRPC::grpc gRPC::grpc++ gRPC::grpc_cronet)
 
 add_library(greeter_rpc ${ProtoGRPCSources})
 target_link_libraries(greeter_rpc greeter_pb)
