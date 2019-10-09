@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     );
 
     plugin_calculator::sptr plugin = creator();
-    std::cout << "plugin->calculate(1.5, 1.5) call:  " << plugin->sum(1.5, 1.5) << std::endl;
-    std::cout << "plugin->calculate(1.5, 1.5) second call:  " << plugin->sum(13.5, 31.5) << std::endl;
+    std::cout << "plugin->sum(1.5, 1.5) call:  " << plugin->sum(1.5, 1.5) << std::endl;
+    std::cout << "plugin->sum(13.5, 31.5) second call:  " << plugin->sum(13.5, 31.5) << std::endl;
     std::cout << "Plugin Name:  " << plugin->name() << std::endl;
 }
