@@ -1,4 +1,4 @@
-find_package(uvw CONFIG REQUIRED)
+#find_package(uvw CONFIG REQUIRED)
 
 aux_source_directory(. SRCS)
 
@@ -6,7 +6,7 @@ aux_source_directory(. SRCS)
 foreach (example_source ${SRCS})
     get_filename_component(example_name ${example_source} NAME_WE)
     add_executable(${example_name} ${example_source})
-    target_link_libraries(${example_name} ${Boost_LIBRARIES} uvw::uvw glog::glog)
+    target_link_libraries(${example_name} ${Boost_LIBRARIES} uvw glog::glog)
     target_include_directories(${example_name} PRIVATE ${OpenCV_INCLUDE_DIRS})
     message(STATUS "add executable: ${example_name} fom source: ${example_source}")
 endforeach (example_source)
