@@ -2,14 +2,16 @@
 // Created by Administrator on 2019/10/9.
 //
 #include <boost/dll/import.hpp> // for import_alias
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include "my_plugin_api.hpp"
 
 namespace dll = boost::dll;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
-    boost::dll::fs::path lib_path(argv[1]);             // argv[1] contains path to directory with our plugin library
+    boost::filesystem::path lib_path(
+            argv[1]);             // argv[1] contains path to directory with our plugin library
     boost::shared_ptr<my_plugin_api> plugin;            // variable to hold a pointer to plugin variable
     std::cout << "Loading the plugin" << std::endl;
 

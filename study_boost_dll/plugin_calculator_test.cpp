@@ -5,13 +5,14 @@
 
 #include <boost/dll/import.hpp> // for import_alias
 #include <boost/function.hpp>
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include "plugin_calculator.hpp"
 
 namespace dll = boost::dll;
 
 int main(int argc, char *argv[]) {
-    boost::dll::fs::path shared_library_path(
+    boost::filesystem::path shared_library_path(
             argv[1]);                  // argv[1] contains path to directory with our plugin library
     shared_library_path /= "plugin_calculator";
     typedef plugin_calculator::sptr (plugin_calculator_create_t)();

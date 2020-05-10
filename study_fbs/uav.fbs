@@ -1,0 +1,31 @@
+namespace cpcm;
+
+table Pos{
+    x:float;
+    y:float;
+    z:float;
+}
+
+table Gos{
+    longitude:float;
+    latitude:float;
+    altitude:float;
+}
+
+enum Mode:byte {
+    LightBridge,
+    Mavic,
+    Wifi
+}
+
+union Location { Gos, Pos }
+
+table Uav{
+    location: Location;
+    mode:Mode;
+    path:[Pos];
+    freq: double;
+    bandwidth: double;
+}
+
+root_type Uav;
